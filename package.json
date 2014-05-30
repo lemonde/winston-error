@@ -12,7 +12,8 @@
   },
   "keywords": [
     "winston",
-    "error"
+    "error",
+    "rewriter"
   ],
   "author": "Greg Bergé <berge.greg@gmail.com>",
   "license": "MIT",
