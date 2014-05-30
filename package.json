@@ -1,0 +1,23 @@
+{
+  "name": "winston-error",
+  "version": "0.0.0",
+  "description": "Winston rewriter to help logging errors.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lemonde/winston-error.git"
+  },
+  "keywords": [
+    "winston",
+    "error"
+  ],
+  "author": "Greg Bergé <berge.greg@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lemonde/winston-error/issues"
+  },
+  "homepage": "https://github.com/lemonde/winston-error"
+}
