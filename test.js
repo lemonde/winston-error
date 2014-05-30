@@ -1,5 +1,4 @@
 var expect = require('chai').expect;
-var sinon = require('sinon');
 var winstonError = require('./index');
 
 describe('Error rewriter', function() {
