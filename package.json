@@ -1,7 +1,7 @@
 {
   "name": "winston-error",
   "version": "0.0.0",
-  "description": "Winston rewriter to help logging errors.",
+  "description": "Error helper for winston.",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
@@ -13,7 +13,7 @@
   "keywords": [
     "winston",
     "error",
-    "rewriter"
+    "helper"
   ],
   "author": "Greg Bergé <berge.greg@gmail.com>",
   "license": "MIT",
@@ -23,7 +23,8 @@
   "homepage": "https://github.com/lemonde/winston-error",
   "devDependencies": {
     "chai": "^1.9.1",
-    "mocha": "^1.20.0"
+    "mocha": "^1.20.0",
+    "winston": "^0.7.3"
   },
   "dependencies": {
     "lodash": "^2.4.1"

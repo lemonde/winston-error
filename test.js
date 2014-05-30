@@ -1,39 +1,39 @@
 var expect = require('chai').expect;
+var winston = require('winston');
 var winstonError = require('./index');
 
-describe('Error rewriter', function() {
-  var meta;
+// Add memory output.
+winston.add(winston.transports.Memory);
 
-  describe('without original metadata', function() {
-    beforeEach(function() {
-      meta = winstonError()('info', new Error('test'));
+describe('Error helper', function() {
+  var logger;
+
+  beforeEach(function () {
+    logger = new winston.Logger({
+      transports: [
+        new winston.transports.Memory({json: true})
+      ]
     });
 
-    it('should add meta.error', function() {
-      expect(meta).to.have.deep.property('error.message', 'test');
-      expect(meta).to.have.deep.property('error.stack');
-    });
+    winstonError(logger);
   });
 
-  describe('with original metadata', function() {
-    var originalMetadata;
+  it('should log error properly', function() {
+    logger.error(new Error('test'));
+    var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
+    expect(logEntry).to.have.deep.property('error.message', 'test');
+    expect(logEntry).to.have.deep.property('error.stack');
+    expect(logEntry).to.have.deep.property('error.code');
+    expect(logEntry).to.have.property('message', 'test');
+  });
 
-    beforeEach(function() {
-      originalMetadata = {foo: 'bar'};
-      meta = winstonError()('info', new Error('test'), originalMetadata);
-    });
-
-    it('should keep original metadata information', function() {
-      expect(meta).to.have.property('foo', 'bar');
-    });
-
-    it('should add meta.error', function () {
-      expect(meta).to.have.deep.property('error.message', 'test');
-      expect(meta).to.have.deep.property('error.stack');
-    });
-
-    it('should leave original metadata untouched', function() {
-      expect(meta).to.not.equal(originalMetadata);
-    });
+  it('should keep metada', function() {
+    logger.error(new Error('test'), {foo: 'bar'});
+    var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
+    expect(logEntry).to.have.deep.property('error.message', 'test');
+    expect(logEntry).to.have.deep.property('error.stack');
+    expect(logEntry).to.have.deep.property('error.code');
+    expect(logEntry).to.have.property('foo', 'bar');
+    expect(logEntry).to.have.property('message', 'test');
   });
 });

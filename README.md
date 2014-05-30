@@ -3,7 +3,7 @@
 [![Dependency Status](https://david-dm.org/lemonde/winston-error.svg?theme=shields.io)](https://david-dm.org/lemonde/winston-error)
 [![devDependency Status](https://david-dm.org/lemonde/winston-error/dev-status.svg?theme=shields.io)](https://david-dm.org/lemonde/winston-error#info=devDependencies)
 
-Winston rewriter to help logging errors.
+Error helper for winston.
 
 ## Install
 
@@ -17,7 +17,10 @@ npm install winston-error
 var winston = require('winston');
 var winstonError = require('winston-error');
 
-winston.addRewriter(winstonError());
+var logger = new winston.Logger();
+winstonError(logger);
+
+logger.error(new Error('My error')); // will add message, stack and code in meta
 ```
 
 ## License
