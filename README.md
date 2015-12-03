@@ -5,6 +5,11 @@
 
 Error helper for winston.
 
+Add a decorator on `winston.error()` which, when an error is passed as first argument,
+also adds it in metadata. The full error object is not added,
+only fields `.message`, '.stack` and `.code` are copied.
+
+
 ## Install
 
 ```
@@ -23,6 +28,15 @@ winstonError(logger);
 logger.error(new Error('My error')); // will add message, stack and code in meta
 ```
 
+
 ## License
 
 MIT
+
+
+## contributing
+
+```bash
+npm i
+npm test
+```
