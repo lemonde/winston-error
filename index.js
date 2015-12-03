@@ -26,7 +26,7 @@ module.exports = function errorLoggerWrapper(logger) {
     message = error.message;
 
     // Log error.
-    var args = [message, metadata].concat(_.rest(arguments, 2));
+    var args = [message, metadata].concat(_.drop(arguments, 2));
     originalErrorLogger.apply(logger, args);
   };
 };
