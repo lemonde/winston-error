@@ -4,8 +4,14 @@ var _ = require('lodash');
  * Expose module.
  */
 
-module.exports = function errorLoggerWrapper(logger) {
+module.exports = function errorLoggerWrapper(logger, options) {
   var originalErrorLogger = logger.error;
+  options = options || {};
+  options.pickedFields = options.pickedFields || [
+    'message',
+    'stack',
+    'code'
+  ];
 
   logger.error = function errorRewriter(message, metadata) {
     if (! (message instanceof Error))
@@ -20,7 +26,7 @@ module.exports = function errorLoggerWrapper(logger) {
     error.code = _.isUndefined(error.code) ? null : error.code;
 
     // Add error in metadata.
-    metadata.error = _.pick(error, 'message', 'stack', 'code');
+    metadata.error = _.pick(error, options.pickedFields);
 
     // Replace message by error message.
     message = error.message;
