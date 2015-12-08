@@ -7,7 +7,7 @@ Error helper for winston.
 
 Add a decorator on `winston.error()` which, when an error is passed as first argument,
 also adds it in metadata and converts the call to a standard winston `(message, metadata, ...)`.
-The full error object is not added, only fields `.message`, `.stack` and `.code` are copied by default.
+The full error object is not added, only standard fields `.name`, `.message` and `.stack` are copied by default.
 
 
 ## Install
@@ -39,7 +39,7 @@ winstonError(logger, {
   ]
 });
 
-logger.error(new Error('My error')); // will add message, stack and triage in meta
+logger.error(new Error('My error')); // will copy message, stack and triage in meta
 ```
 
 

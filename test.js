@@ -25,21 +25,22 @@ describe('Error helper', function() {
 
       logger.error(err);
       var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
+      expect(logEntry).to.have.deep.property('error.name', 'Error');
       expect(logEntry).to.have.deep.property('error.message', 'test');
       expect(logEntry).to.have.deep.property('error.stack');
-      expect(logEntry).to.have.deep.property('error.code');
       expect(logEntry).to.have.property('message', 'test');
     });
 
-    it('should keep existing metada', function() {
+    it('should keep existing metadata', function() {
       var err = new Error('test');
       err.bar = 'baz';
 
       logger.error(err, {foo: 'bar'});
       var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
+      expect(logEntry).to.have.deep.property('error.name', 'Error');
       expect(logEntry).to.have.deep.property('error.message', 'test');
       expect(logEntry).to.have.deep.property('error.stack');
-      expect(logEntry).to.have.deep.property('error.code');
+      expect(logEntry).to.not.have.deep.property('error.bar'); // since not standard
       expect(logEntry).to.have.property('foo', 'bar');
       expect(logEntry).to.have.property('message', 'test');
     });
@@ -55,9 +56,10 @@ describe('Error helper', function() {
 
       winstonError(logger, {
         pickedFields: [
+          // "name" removed
           'message',
           'stack',
-          'bar'
+          'bar' // added
         ]
       });
     });
@@ -70,9 +72,9 @@ describe('Error helper', function() {
       logger.error(new Error('test'));
 
       var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
+      expect(logEntry).to.not.have.deep.property('error.name'); // no longer picked
       expect(logEntry).to.have.deep.property('error.message', 'test');
       expect(logEntry).to.have.deep.property('error.stack');
-      expect(logEntry).to.not.have.deep.property('error.code'); // no more
       expect(logEntry).to.have.deep.property('error.bar', 'baz'); // new one
       expect(logEntry).to.have.property('message', 'test');
     });
