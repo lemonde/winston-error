@@ -5,9 +5,9 @@
 
 Error helper for winston.
 
-Add a decorator on `winston.error()` which, when an error is passed as first argument,
+Add a decorator on `winston.error()` (by default, customizable) which, when an error is passed as first argument,
 also adds it in metadata and converts the call to a standard winston `(message, metadata, ...)`.
-The full error object is not added, only standard fields `.name`, `.message` and `.stack` are copied by default.
+The full error object is not added, only standard fields `.name`, `.message` and `.stack` are copied (by default, customizable).
 
 
 ## Install
@@ -41,6 +41,20 @@ winstonError(logger, {
 });
 
 logger.error(new Error('My error')); // will copy name, message, stack and status in meta
+```
+
+Decorated levels can be explicitly selected :
+
+```js
+winstonError(logger, {
+  decoratedLevels: [
+    'error',
+    'warn'
+  ]
+});
+
+logger.error(new Error('My error')); // will copy name, message and stack in meta
+logger.warn(new Error('My error')); // will copy name, message and stack in meta
 ```
 
 
