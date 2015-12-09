@@ -25,28 +25,39 @@ describe('Error helper', function() {
 
       logger.error(err);
       var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
+      expect(logEntry).to.have.property('message', 'test');
       expect(logEntry).to.have.deep.property('error.name', 'Error');
       expect(logEntry).to.have.deep.property('error.message', 'test');
       expect(logEntry).to.have.deep.property('error.stack');
-      expect(logEntry).to.have.property('message', 'test');
     });
 
-    it('should keep existing metadata', function() {
+    it('should keep existing metadata when rewriting call', function() {
       var err = new Error('test');
       err.bar = 'baz'; // non standard error property
 
       logger.error(err, {foo: 'bar'});
       var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
+      expect(logEntry).to.have.property('message', 'test');
+      expect(logEntry).to.have.property('foo', 'bar');
       expect(logEntry).to.have.deep.property('error.name', 'Error');
       expect(logEntry).to.have.deep.property('error.message', 'test');
       expect(logEntry).to.have.deep.property('error.stack');
       expect(logEntry).to.not.have.deep.property('error.bar'); // not picked since not standard
+    });
+
+    it('should decorate only error()', function () {
+      var err = new Error('test');
+
+      logger.info(err, {foo: 'bar'});
+      var temp = logger.transports.memory.writeOutput;
+      var logEntry = JSON.parse(logger.transports.memory.writeOutput[0]);
+      expect(logEntry).to.have.property('message', '[Error: test]'); // wasn't decorated
       expect(logEntry).to.have.property('foo', 'bar');
-      expect(logEntry).to.have.property('message', 'test');
+      expect(logEntry).to.not.have.deep.property('error');
     });
   });
 
-  context('with explicit fields to pick', function () {
+  context('with custom parameters', function () {
     beforeEach(function () {
       logger = new winston.Logger({
         transports: [
@@ -55,6 +66,10 @@ describe('Error helper', function() {
       });
 
       winstonError(logger, {
+        decoratedLevels: [
+          'error',
+          'warn'
+        ],
         pickedFields: {
           // "name" removed
           message: 'default',
@@ -65,19 +80,38 @@ describe('Error helper', function() {
       });
     });
 
-    it('should log error properly by copying only specified fields in metadata', function() {
-      var err = new Error('test');
-      err.bar = 'baz';
+    context('with explicit fields to pick', function () {
+      it('should decorate properly by copying specified fields in metadata', function() {
+        var err = new Error('test');
+        err.bar = 'baz';
 
-      logger.error(err);
+        logger.error(err);
 
-      var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
-      expect(logEntry, '.name').to.not.have.deep.property('error.name'); // no longer picked
-      expect(logEntry, '.message').to.have.deep.property('error.message', 'test');
-      expect(logEntry, '.stack').to.have.deep.property('error.stack');
-      expect(logEntry, '.foo').to.have.deep.property('error.foo', null); // new one, with its default value
-      expect(logEntry, '.bar').to.have.deep.property('error.bar', 'baz'); // new one, with its actual value
-      expect(logEntry, 'message').to.have.property('message', 'test');
+        var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
+        expect(logEntry, 'message').to.have.property('message', 'test');
+        expect(logEntry, '.name').to.not.have.deep.property('error.name'); // no longer picked
+        expect(logEntry, '.message').to.have.deep.property('error.message', 'test');
+        expect(logEntry, '.stack').to.have.deep.property('error.stack');
+        expect(logEntry, '.foo').to.have.deep.property('error.foo', null); // new one, with its default value
+        expect(logEntry, '.bar').to.have.deep.property('error.bar', 'baz'); // new one, with its actual value
+      });
+    });
+
+    context('with explicit levels to decorate', function () {
+      it('should decorate all given levels', function() {
+        var err = new Error('test');
+        err.bar = 'baz';
+
+        logger.warn(err);
+
+        var logEntry = JSON.parse(logger.transports.memory.writeOutput[0]);
+        expect(logEntry, 'message').to.have.property('message', 'test');
+        expect(logEntry, '.name').to.not.have.deep.property('error.name'); // no longer picked
+        expect(logEntry, '.message').to.have.deep.property('error.message', 'test');
+        expect(logEntry, '.stack').to.have.deep.property('error.stack');
+        expect(logEntry, '.foo').to.have.deep.property('error.foo', null); // new one, with its default value
+        expect(logEntry, '.bar').to.have.deep.property('error.bar', 'baz'); // new one, with its actual value
+      });
     });
   });
 

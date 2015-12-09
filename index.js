@@ -11,6 +11,9 @@ module.exports = function winstonLoggerDecorator(logger, options) {
   var originalLogger = _.clone(logger); // not deep
 
   options = options || {};
+  options.decoratedLevels = options.decoratedLevels || [
+    'error'
+  ];
   options.pickedFields = options.pickedFields || {
     name: undefined,
     message: undefined,
@@ -18,11 +21,11 @@ module.exports = function winstonLoggerDecorator(logger, options) {
   };
   var pickedKeys = _.keys(options.pickedFields);
 
-  function winstonCallRewriter(message, metadata) {
+  function winstonCallRewriter(loggerMethod, message, metadata) {
 
     if (! (message instanceof Error)) {
       // this decorator isn't needed
-      return originalLogger.error.apply(logger, arguments);
+      return loggerMethod.apply(logger, arguments);
     }
 
     var error = message;
@@ -41,9 +44,11 @@ module.exports = function winstonLoggerDecorator(logger, options) {
     message = error.message;
 
     // Log with arguments re-arranged.
-    var args = [message, metadata].concat(_.drop(arguments, 2));
-    originalLogger.error.apply(logger, args);
+    var args = [message, metadata].concat(_.drop(arguments, 3));
+    loggerMethod.apply(logger, args);
   }
 
-  logger.error = winstonCallRewriter;
+  options.decoratedLevels.forEach(function(level) {
+    logger[level] = _.partial(winstonCallRewriter, originalLogger[level]);
+  });
 };
