@@ -6,38 +6,44 @@ var _ = require('lodash');
  * Expose module.
  */
 
-module.exports = function errorLoggerWrapper(logger, options) {
-  var originalErrorLogger = logger.error;
-  options = options || {};
-  options.pickedFields = options.pickedFields || [
-    'name',
-    'message',
-    'stack'
-  ];
+module.exports = function winstonLoggerDecorator(logger, options) {
 
-  logger.error = function errorRewriter(message, metadata) {
-    if (! (message instanceof Error))
-      return originalErrorLogger.apply(logger, arguments);
+  var originalLogger = _.clone(logger); // not deep
+
+  options = options || {};
+  options.pickedFields = options.pickedFields || {
+    name: undefined,
+    message: undefined,
+    stack: undefined
+  };
+  var pickedKeys = _.keys(options.pickedFields);
+
+  function winstonCallRewriter(message, metadata) {
+
+    if (! (message instanceof Error)) {
+      // this decorator isn't needed
+      return originalLogger.error.apply(logger, arguments);
+    }
 
     var error = message;
 
     // Keep original metadata safe.
     metadata = _.clone(metadata || {});
 
-    // Set the missing whitelisted fields to null by default.
-    _.forEach(options.pickedFields, function(key) {
-      if (_.isUndefined(error[key]))
-        error[key] = null;
-    });
-
-    // Add error in metadata, with keys filtered
-    metadata.error = _.pick(error, options.pickedFields);
+    // Copy only whitelisted error fields in metadata,
+    // providing an optional default value
+    metadata.error = _.defaults(
+      _.pick(error, pickedKeys),
+      options.pickedFields
+    );
 
     // Replace message by error message.
     message = error.message;
 
-    // Log with arguments rearanged.
+    // Log with arguments re-arranged.
     var args = [message, metadata].concat(_.drop(arguments, 2));
-    originalErrorLogger.apply(logger, args);
-  };
+    originalLogger.error.apply(logger, args);
+  }
+
+  logger.error = winstonCallRewriter;
 };

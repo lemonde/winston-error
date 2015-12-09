@@ -33,14 +33,14 @@ describe('Error helper', function() {
 
     it('should keep existing metadata', function() {
       var err = new Error('test');
-      err.bar = 'baz';
+      err.bar = 'baz'; // non standard error property
 
       logger.error(err, {foo: 'bar'});
       var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
       expect(logEntry).to.have.deep.property('error.name', 'Error');
       expect(logEntry).to.have.deep.property('error.message', 'test');
       expect(logEntry).to.have.deep.property('error.stack');
-      expect(logEntry).to.not.have.deep.property('error.bar'); // since not standard
+      expect(logEntry).to.not.have.deep.property('error.bar'); // not picked since not standard
       expect(logEntry).to.have.property('foo', 'bar');
       expect(logEntry).to.have.property('message', 'test');
     });
@@ -55,12 +55,13 @@ describe('Error helper', function() {
       });
 
       winstonError(logger, {
-        pickedFields: [
+        pickedFields: {
           // "name" removed
-          'message',
-          'stack',
-          'bar' // added
-        ]
+          message: 'default',
+          stack: null,
+          foo: null, // added
+          bar: null // added
+        }
       });
     });
 
@@ -69,14 +70,14 @@ describe('Error helper', function() {
       err.bar = 'baz';
 
       logger.error(err);
-      logger.error(new Error('test'));
 
       var logEntry = JSON.parse(logger.transports.memory.errorOutput[0]);
-      expect(logEntry).to.not.have.deep.property('error.name'); // no longer picked
-      expect(logEntry).to.have.deep.property('error.message', 'test');
-      expect(logEntry).to.have.deep.property('error.stack');
-      expect(logEntry).to.have.deep.property('error.bar', 'baz'); // new one
-      expect(logEntry).to.have.property('message', 'test');
+      expect(logEntry, '.name').to.not.have.deep.property('error.name'); // no longer picked
+      expect(logEntry, '.message').to.have.deep.property('error.message', 'test');
+      expect(logEntry, '.stack').to.have.deep.property('error.stack');
+      expect(logEntry, '.foo').to.have.deep.property('error.foo', null); // new one, with its default value
+      expect(logEntry, '.bar').to.have.deep.property('error.bar', 'baz'); // new one, with its actual value
+      expect(logEntry, 'message').to.have.property('message', 'test');
     });
   });
 

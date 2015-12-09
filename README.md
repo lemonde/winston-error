@@ -28,18 +28,19 @@ winstonError(logger);
 logger.error(new Error('My error')); // will add message, stack and code in meta
 ```
 
-Copied fields can be explicitly set :
+Copied fields can be explicitly selected, with a default value :
 
 ```js
 winstonError(logger, {
-  pickedFields: [
-    'message',
-    'stack',
-    'triage'
-  ]
+  pickedFields: {
+    name: undefined,
+    message: undefined,
+    stack: undefined,
+    status: 500
+  }
 });
 
-logger.error(new Error('My error')); // will copy message, stack and triage in meta
+logger.error(new Error('My error')); // will copy name, message, stack and status in meta
 ```
 
 
