@@ -24,7 +24,7 @@
   "devDependencies": {
     "chai": "^3.4.1",
     "mocha": "^2.3.4",
-    "winston": "^0.7.3"
+    "winston": "^2.1.1"
   },
   "dependencies": {
     "lodash": "^3.10.1"
