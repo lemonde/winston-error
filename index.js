@@ -25,7 +25,7 @@ module.exports = function winstonLoggerDecorator(logger, options) {
 
     if (! (message instanceof Error)) {
       // this decorator isn't needed
-      return loggerMethod.apply(logger, arguments);
+      return loggerMethod.apply(logger, _.drop(arguments, 1));
     }
 
     var error = message;
