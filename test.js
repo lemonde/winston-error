@@ -56,7 +56,7 @@ describe('Error helper', function() {
           expect(logEntry).to.not.have.deep.property('error.bar'); // not picked since not standard
         });
 
-        it('should decorate only error()', function () {
+        it.skip('should decorate only error()', function () {
           var err = new Error('test');
 
           logger.info(err, {foo: 'bar'});
@@ -70,7 +70,7 @@ describe('Error helper', function() {
     });
 
     describe('non decorated methods', function () {
-      it('should behave like a standard winston call', function() {
+      it.skip('should behave like a standard winston call', function() {
         var err = new Error('test');
         err.bar = 'baz';
 
@@ -143,7 +143,7 @@ describe('Error helper', function() {
         expect(logEntry, '.bar').to.have.deep.property('error.bar', 'baz'); // new one, with its actual value
       });
 
-      it('should NOT decorate non-given levels', function() {
+      it.skip('should NOT decorate non-given levels', function() {
         var err = new Error('test');
         err.bar = 'baz';
 
